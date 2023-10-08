@@ -75,7 +75,7 @@ const data: DataType[] = [
 const CardTotalEarnings = () => {
   const theme = useTheme()
   return (
-    <Card>
+    <Card sx={{height : '100%'}}>
       <CardHeader
         title='买卖目标'
         titleTypographyProps={{ textAlign: "center" }}

@@ -25,6 +25,7 @@ import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Custom Components Imports
 import OptionsMenu from 'src/@core/components/option-menu'
+import {useSettings} from "../../../@core/hooks/useSettings";
 
 interface DataType {
   title: string
@@ -92,11 +93,12 @@ const chartData = [
 ]
 
 const CardWebsiteStats = () => {
+  const { results } = useSettings()
   // ** Hook
   const theme = useTheme()
 
   return (
-    <Card>
+    <Card sx={{height : '100%'}}>
       <CardHeader
         title='定时交易'
         titleTypographyProps={{ textAlign: "center" }}
@@ -105,7 +107,7 @@ const CardWebsiteStats = () => {
         <Box sx={{ mb: 4.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography variant='h3' sx={{ mb: 0.5 }}>
-              4,590
+              {results.timeSwap.total}
             </Typography>
             <Typography variant='caption'>总交易次数</Typography>
           </Box>

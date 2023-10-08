@@ -9,14 +9,11 @@ import CardContent from '@mui/material/CardContent'
 import { ApexOptions } from 'apexcharts'
 
 // ** Custom Components Imports
-import CustomChip from 'src/@core/components/mui/chip'
-import OptionsMenu from 'src/@core/components/option-menu'
 import ReactApexcharts from 'src/@core/components/react-apexcharts'
 import Box from "@mui/material/Box";
 import Icon from "../../../@core/components/icon";
 import {ReactNode} from "react";
 import {ThemeColor} from "../../../@core/layouts/types";
-import {Bar, BarChart, ResponsiveContainer} from "recharts";
 import TableContainer from "@mui/material/TableContainer";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";

@@ -1,5 +1,14 @@
-const Home = () => {
-  return <>Home Page</>
-}
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-export default Home
+import Home from "./home";
+
+const App = () => (
+  <Router>
+    <Routes>
+      <Route  path="/" element={<Home />} />
+    </Routes>
+  </Router>
+);
+
+export default App;

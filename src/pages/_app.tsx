@@ -62,6 +62,7 @@ import 'src/iconify-bundle/icons-bundle-react'
 
 // ** Global css styles
 import '../../styles/globals.css'
+import {TimerProvider} from "../state/TaskContext";
 
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
@@ -118,7 +119,7 @@ const App = (props: ExtendedAppProps) => {
   const aclAbilities = Component.acl ?? defaultACLObj
 
   return (
-    
+
       <CacheProvider value={emotionCache}>
         <Head>
           <title>{`${themeConfig.templateName} - Material Design React Admin Template`}</title>
@@ -131,8 +132,10 @@ const App = (props: ExtendedAppProps) => {
         </Head>
 
         <AuthProvider>
+          <TimerProvider>
           <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
             <SettingsConsumer>
+
               {({ settings }) => {
                 return (
                   <ThemeComponent settings={settings}>
@@ -147,11 +150,13 @@ const App = (props: ExtendedAppProps) => {
                   </ThemeComponent>
                 )
               }}
+
             </SettingsConsumer>
           </SettingsProvider>
+          </TimerProvider>
         </AuthProvider>
       </CacheProvider>
-   
+
   )
 }
 

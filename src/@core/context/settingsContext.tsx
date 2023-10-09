@@ -26,34 +26,7 @@ export type Settings = {
   verticalNavToggleType: VerticalNavToggle
   toastPosition?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
 }
-export type His = {
-  id: string
-  typeTx: string
-  times: string
-}
-export type SwapResult = {
-  timeSwap: {
-    total: number
-    his: His[]
-  }
-  targetSwap: {
-    price: string
-    percent: string
-    his: His[]
-  }
-}
 
-const initialResult: SwapResult = {
-  timeSwap: {
-    total: 10002,
-    his: []
-  },
-  targetSwap: {
-    price: '0',
-    percent: '0',
-    his: []
-  }
-}
 
 export type PageSpecificSettings = {
   skin?: Skin
@@ -74,9 +47,6 @@ export type PageSpecificSettings = {
 export type SettingsContextValue = {
   settings: Settings
   saveSettings: (updatedSettings: Settings) => void
-  results: SwapResult
-  updateResults: (results: SwapResult) => void
-
 }
 
 interface SettingsProviderProps {
@@ -147,16 +117,12 @@ const storeSettings = (settings: Settings) => {
 // ** Create Context
 export const SettingsContext = createContext<SettingsContextValue>({
   saveSettings: () => null,
-  settings: initialSettings,
-  results: initialResult,
-  setResults: () => null
+  settings: initialSettings
 })
 
 export const SettingsProvider = ({ children, pageSettings }: SettingsProviderProps) => {
   // ** State
   const [settings, setSettings] = useState<Settings>({ ...initialSettings })
-
-  const [results, setResults] = useState<SwapResult>({ ...initialResult})
 
   useEffect(() => {
     const restoredSettings = restoreSettings()
@@ -187,7 +153,7 @@ export const SettingsProvider = ({ children, pageSettings }: SettingsProviderPro
     setSettings(updatedSettings)
   }
 
-  return <SettingsContext.Provider value={{ settings, saveSettings, results, setResults }}>{children}</SettingsContext.Provider>
+  return <SettingsContext.Provider value={{ settings, saveSettings, }}>{children}</SettingsContext.Provider>
 }
 
 export const SettingsConsumer = SettingsContext.Consumer

@@ -24,8 +24,7 @@ import { BarChart, Bar, ResponsiveContainer } from 'recharts'
 import { ThemeColor } from 'src/@core/layouts/types'
 
 // ** Custom Components Imports
-import OptionsMenu from 'src/@core/components/option-menu'
-import {useSettings} from "../../../@core/hooks/useSettings";
+import {useTimer} from "../../../hooks/useTimer";
 
 interface DataType {
   title: string
@@ -93,7 +92,7 @@ const chartData = [
 ]
 
 const CardWebsiteStats = () => {
-  const { results } = useSettings()
+  const { state } = useTimer()
   // ** Hook
   const theme = useTheme()
 
@@ -107,7 +106,7 @@ const CardWebsiteStats = () => {
         <Box sx={{ mb: 4.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography variant='h3' sx={{ mb: 0.5 }}>
-              {results.timeSwap.total}
+              {state.swapTime.total}
             </Typography>
             <Typography variant='caption'>总交易次数</Typography>
           </Box>

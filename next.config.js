@@ -15,5 +15,14 @@ module.exports = {
     }
 
     return config
-  }
+  },
+  // Disable Server Side Rendering (SSR)
+  exportPathMap: async function (
+    defaultPathMap,
+    { dev, dir, outDir, distDir, buildId }
+  ) {
+    return {
+      '/': { page: '/' },
+    };
+  },
 }

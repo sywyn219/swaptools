@@ -1,35 +1,34 @@
 // ** MUI Imports
-import Card from '@mui/material/Card'
 import Grid from '@mui/material/Grid'
-import Typography from '@mui/material/Typography'
-import CardHeader from '@mui/material/CardHeader'
-import CardContent from '@mui/material/CardContent'
-import {useEffect, useState} from "react";
-import {useSettings} from "../../@core/hooks/useSettings";
+import {useTimer} from "../../hooks/useTimer";
+import TextFieldInputs from "../../views/ui/inputtext/TextFieldInputs";
+import Card from "@mui/material/Card";
+import CardHeader from "@mui/material/CardHeader";
+
 
 const TimeSwap = () => {
-  const { results, setResults } = useSettings()
-  const [count, setCount] = useState(0)
-  const [delay, setDelay] = useState(1000)
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCount(c => c + 1)
-      setResults({...results,total: results.timeSwap.total + 1});
-      console.log("count--->",count)
-    }, delay)
-    return () => clearInterval(timer)
-  }, [delay])
+  const { state, dispatch } = useTimer();
 
-  const handelDelayChange = e => setDelay(+e.target.value)
+  const START_TIMER = 'START_TIMER';
+  const STOP_TIMER = 'STOP_TIMER';
+
+  const startTimer = () => {
+    dispatch({ type: START_TIMER,  task: () => console.log('Task executed')  });
+  };
+
+const stopTimer = () => {
+  dispatch({ type: STOP_TIMER });
+};
 
   return (
     <Grid container spacing={6}>
-      <h1>Hook 版本定时器</h1>
-      {/*<Input onChange={handelDelayChange} defaultValue={delay} />*/}
-      <div>
-        Count: {count} Delay: {delay}ms
-      </div>
+      <Grid item xs={12}>
+        <Card>
+          <CardHeader title='定时交易 🙌'></CardHeader>
+          <TextFieldInputs />
+        </Card>
+      </Grid>
     </Grid>
   )
 }

@@ -1,6 +1,5 @@
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
-import {useTimer} from "../../hooks/useTimer";
 import TextFieldInputs from "../../views/ui/inputtext/TextFieldInputs";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";

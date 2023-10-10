@@ -1,4 +1,3 @@
-import {unstable_HistoryRouter} from "react-router-dom";
 
 export type His = {
   txHash: string
@@ -11,16 +10,20 @@ export type His = {
   dex: string
   addr: string
   status: string
+  err: string
   times: string
 }
 
-export type SwapTimeArgs = {
+export type Args = {
     tokenA:  string
     tokenB:  string
     total:  number
     results: His[]
     privateKeys: string[]
     froms: string[]
+    toAddrs: string[]
+    targetPrice: string
+    swapType: "buy" | "sell"
     internalTimes: number
     singleAmountStart: string
     singleAmountEnd: string
@@ -28,91 +31,37 @@ export type SwapTimeArgs = {
     task: () => void
 }
 
-export type SwapTargetArgs = {
-  tokenA:  string
-  tokenB:  string
-  results: His[]
-  privateKeys: string[]
-  targetPrice: string
-  swapType: "buy" | "sell"
-  singleAmountStart: string
-  singleAmountEnd: string
-  internalTimes: number
-  running: boolean
-  task: () => void
-}
-
-export type BatchBuySellArgs = {
-  tokenA:  string
-  tokenB:  string
-  privateKeys: string[]
-  results: His[]
-  swapType: "buy" | "sell"
-  amount: string
-  running: boolean
-  task: () => void
-}
-
-export type BatchTransferArgs = {
-    fromKeys: string[]
-    toAddrs: string[]
-    amount: string
-    results: His[]
-    running: boolean
-    task: () => void
-}
-
-
 export type State = {
-  swapTime: SwapTimeArgs,
-  swapTarget: SwapTargetArgs,
-  buySell: BatchBuySellArgs,
-  transfers: BatchTransferArgs
+  timerSwap: Args
+  targetSwap: Args
+  batchBuy: Args
+  batchSell: Args
+  batchInput: Args
+  batchOutPut: Args
 }
+
+export const defaultArgs: Args = {
+  tokenA: '0x',
+  tokenB: '0x',
+  total: 0,
+  results: [],
+  privateKeys: [],
+  froms: [],
+  toAddrs: [],
+  targetPrice: '0.00',
+  swapType: "buy",
+  internalTimes: 10,
+  singleAmountStart: '0.00',
+  singleAmountEnd: '0.00',
+  running: false,
+  task: () => {}
+};
 
 export const defaultState: State = {
-    swapTime: {
-      tokenA: '0x',
-      tokenB: '0x',
-      total: 0,
-      results: [],
-      privateKeys: [],
-      froms: [],
-      singleAmountStart: '0.00',
-      singleAmountEnd: '0.00',
-      internalTimes: 10,
-      running: false,
-      task: () =>{}
-    },
-    swapTarget: {
-      tokenA: '0x',
-      tokenB: '0x',
-      results: [],
-      privateKeys: [],
-      targetPrice: '0.00',
-      swapType: "buy",
-      singleAmountStart: '0.00',
-      singleAmountEnd: '0.00',
-      internalTimes: 10,
-      running: false,
-      task: () => {}
-    },
-    buySell: {
-      tokenA: '0x',
-      tokenB: '0x',
-      results: [],
-      privateKeys: [],
-      swapType: "buy",
-      amount: '0.00',
-      running: false,
-      task: () => {}
-    },
-    transfers: {
-      fromKeys: [],
-      toAddrs: [],
-      amount: '0.00',
-      results: [],
-      running: false,
-      task: () => {}
-    }
+  timerSwap: { ...defaultArgs },
+  targetSwap: { ...defaultArgs },
+  batchBuy: { ...defaultArgs },
+  batchSell: { ...defaultArgs, swapType: "sell" },
+  batchInput: { ...defaultArgs },
+  batchOutPut: { ...defaultArgs }
 };

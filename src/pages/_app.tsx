@@ -62,7 +62,7 @@ import 'src/iconify-bundle/icons-bundle-react'
 
 // ** Global css styles
 import '../../styles/globals.css'
-import {TimerProvider} from "../state/TaskContext";
+import {TaskProvider} from "../state/TaskContext";
 
 // ** Extend App Props with Emotion
 type ExtendedAppProps = AppProps & {
@@ -132,7 +132,7 @@ const App = (props: ExtendedAppProps) => {
         </Head>
 
         <AuthProvider>
-          <TimerProvider>
+          <TaskProvider>
           <SettingsProvider {...(setConfig ? { pageSettings: setConfig() } : {})}>
             <SettingsConsumer>
 
@@ -153,7 +153,7 @@ const App = (props: ExtendedAppProps) => {
 
             </SettingsConsumer>
           </SettingsProvider>
-          </TimerProvider>
+          </TaskProvider>
         </AuthProvider>
       </CacheProvider>
 

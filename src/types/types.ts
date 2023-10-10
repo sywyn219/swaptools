@@ -20,6 +20,7 @@ export type SwapTimeArgs = {
     total:  number
     results: His[]
     privateKeys: string[]
+    froms: string[]
     internalTimes: number
     singleAmountStart: string
     singleAmountEnd: string
@@ -76,6 +77,7 @@ export const defaultState: State = {
       total: 0,
       results: [],
       privateKeys: [],
+      froms: [],
       singleAmountStart: '0.00',
       singleAmountEnd: '0.00',
       internalTimes: 10,

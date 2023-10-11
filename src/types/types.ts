@@ -1,18 +1,21 @@
 
 export type His = {
-  txHash: string
-  typeTx: string
-  fromAddr: string
-  toAddr:   string
-  price: string
-  volumeA: string
-  volumeB: string
-  dex: string
-  addr: string
-  status: string
-  err: string
-  times: string
-}
+  txHash: string;
+  tokenA:  string
+  tokenB:  string
+  typeTx: string;
+  fromAddr: string;
+  toAddr: string;
+  price: string;
+  volumeA: string;
+  volumeB: string;
+  dex: string;
+  addr: string;
+  status: string;
+  title: string;
+  err: string;
+  times: string;
+};
 
 export type Args = {
     tokenA:  string
@@ -28,7 +31,7 @@ export type Args = {
     singleAmountStart: string
     singleAmountEnd: string
     running: boolean
-    task: () => void
+    task:  () => void
 }
 
 export type State = {
@@ -54,7 +57,7 @@ export const defaultArgs: Args = {
   singleAmountStart: '0.00',
   singleAmountEnd: '0.00',
   running: false,
-  task: () => {}
+  task: async () => {}
 };
 
 export const defaultState: State = {

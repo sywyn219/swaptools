@@ -148,10 +148,10 @@ const CardWidgetsTotalVisits = (props) => {
       <TableContainer>
         <Table>
           <TableBody>
-            {data.map((row: DataType) => {
+            {data.map((row: DataType, number) => {
               return (
                 <TableRow
-                  key={row.title}
+                  key={number}
                   sx={{
                     '&:last-of-type td': { border: 0, pb: 0 },
                     '& .MuiTableCell-root': {

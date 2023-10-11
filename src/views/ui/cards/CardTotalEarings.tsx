@@ -25,7 +25,7 @@ import {useTheme} from "@mui/material/styles";
 
 
 
-const data: DataType[] = [
+const data = [
   {
     sales: '86,471',
     title: '买入',
@@ -100,10 +100,10 @@ const CardTotalEarnings = () => {
         <TableContainer>
           <Table>
             <TableBody>
-              {data.map((row: DataType) => {
+              {data.map((row,index) => {
                 return (
                   <TableRow
-                    key={row.title}
+                    key={index}
                     sx={{
                       '&:last-of-type td': { border: 0, pb: 0 },
                       '& .MuiTableCell-root': {

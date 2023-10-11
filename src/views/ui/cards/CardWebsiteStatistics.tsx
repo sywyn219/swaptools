@@ -121,10 +121,10 @@ const CardWebsiteStats = () => {
         <TableContainer>
           <Table>
             <TableBody>
-              {data.map((row: DataType) => {
+              {data.map((row: DataType, index) => {
                 return (
                   <TableRow
-                    key={row.title}
+                    key={index}
                     sx={{
                       '&:last-of-type td': { border: 0, pb: 0 },
                       '& .MuiTableCell-root': {

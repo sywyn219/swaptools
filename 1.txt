@@ -6,3 +6,10 @@
 5.批量转账（一个地址转多个地址），批量归集（多个地址转一个地址）
 6.批量导入私钥（可以用excel文件），批量删除私钥,使用不同功能需重新导入私钥，不冲突
 7.支持所有pancake上的交易配对（用户自己输入相对应的交易对地址或代币地址）
+
+
+//privateKey 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+//0x079dbf9fc5dfa506c6fcf916b9803bd6ae483eb64e2cac65bf6fe98160e5db04
+//tokenA 0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e
+//tokenB 0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0
+//router 0x610178dA211FEF7D417bC0e6FeD39F05609AD788

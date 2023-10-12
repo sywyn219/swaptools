@@ -12,21 +12,31 @@ import {useTask} from "../../../hooks/useTask";
 import {ethers} from "ethers";
 import {
   addressZero,
-  checkAndClearArray, compareStrings,
+  checkAndClearArray, compareStrings, getRandBuySell, getRandElement, getRandomDecimalInRange, getRandPath,
   getTimes,
   isInteger,
   isNumber,
   mergeArrays,
-  removeEmptyStrings
+  removeEmptyStrings, sleep
 } from "../../../util/arr";
 import Alert from "@mui/material/Alert";
 import AlertTitle from "@mui/material/AlertTitle";
 
-import {tokenAbi} from "../../../util/tokenAbi";
+import {pancakeV2test, swapAbi, tokenAbi} from "../../../util/tokenAbi";
+import {useEffect, useState, useRef} from "react";
 const TextFieldLayout = () => {
 
   const { state, dispatch } = useTask();
+  const [isStart, setStart] = useState(state.timerSwap.running);
 
+  const [results,setResults] = useState([])
+
+  // @ts-ignore
+  const addResults = (re) => {
+    setResults( prevData => {
+      return checkAndClearArray(prevData, 20 ,re)
+    })
+  }
 
   async function iterateArray(arr: any[]): Promise<string[]> {
         // 迭代数组并进行操作
@@ -52,73 +62,146 @@ const TextFieldLayout = () => {
       const addrs = await Promise.all(await iterateArray(str));
 
       if (addrs.length > 0) {
-        const his = {
+        addResults({
           title: "success",
           status: "输入私钥成功" + " 数量 "+ addrs.length,
           times: getTimes()
-        }
-
+        })
         const fromAddrs = mergeArrays(state.timerSwap.froms, addrs)
         const fromKeys = mergeArrays(state.timerSwap.privateKeys, str)
-
-        const results = checkAndClearArray(state.timerSwap.results,20, his)
-        dispatch({type: 'SET_TIMER_SWAP', args: {...state.timerSwap, froms: fromAddrs, privateKeys: fromKeys,
-            running: false, results: results, task: ()=>{}}})
+        dispatch({type: 'SET_TIMER_SWAP', args: {...state.timerSwap, froms: fromAddrs, privateKeys: fromKeys}})
       }
 
     } catch (error: any) {
-      const his = {
+      addResults({
         title: "error",
         err: "私钥错误 "+ error.value,
         times: getTimes()
-      }
-
-      const results = checkAndClearArray(state.timerSwap.results,20, his)
-
-      dispatch({type: 'SET_TIMER_SWAP', args: {...state.timerSwap,froms: [], privateKeys: [], running: false, results: results,task: ()=>{}}})
-
+      })
+      dispatch({type: 'SET_TIMER_SWAP', args: {...state.timerSwap,froms: [], privateKeys: []}})
       return [];
     }
 
+    setStart(false)
   }
 
   // @ts-ignore
   const handleTokenA = (e) => {
-    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, running: false, task: () =>{}, tokenA: e.target.value }});
+    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap,tokenA: e.target.value }});
+    setStart(false)
   }
 
   // @ts-ignore
   const handleTokenB = (e) => {
-    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, running: false, task: () =>{}, tokenB: e.target.value }});
+    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, tokenB: e.target.value }});
+
+    setStart(false)
   }
 
-  const startTimer = async () => {
-    const err = checkArgs()
-    if (err !== null) {
-      const his = {
-        title: "error",
-        err: err
+
+  const taskFn = async (index) => {
+    try {
+      const provider = ethers.getDefaultProvider(state.nodes[index])
+      const key = getRandElement(state.timerSwap.privateKeys);
+
+      const walletP = new ethers.Wallet(key);
+      const wallet = walletP.connect(provider)
+
+      const addr = await wallet.getAddress()
+
+      const swap = new ethers.Contract(pancakeV2test, swapAbi, wallet);
+
+
+      const tokenB = new ethers.Contract(state.timerSwap.tokenB, tokenAbi, wallet);
+      const tokenA = new ethers.Contract(state.timerSwap.tokenA, tokenAbi, wallet);
+      const decimalsB = await tokenB.decimals();
+      const va = getRandomDecimalInRange(state.timerSwap.singleAmountStart,state.timerSwap.singleAmountEnd);
+      const amtIn = ethers.parseUnits(va,decimalsB);
+
+      const pathBuy = [state.timerSwap.tokenB,state.timerSwap.tokenA];
+      const pathSell = [state.timerSwap.tokenA,state.timerSwap.tokenB];
+
+      const buyOrSell = getRandBuySell();
+
+      const valueOut = await swap.getAmountsOut(amtIn, pathBuy);
+
+      let path = pathBuy
+      let token = tokenB
+      let amt = amtIn
+      //sell
+      if (buyOrSell == 1) {
+        path = pathSell;
+        token = tokenA;
+        amt = valueOut[1];
       }
-      const results = checkAndClearArray(state.timerSwap.results, 20, his)
-      dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, results: results, running: false, task: ()=>{} }});
-      return
+      const approveAmt = await token.allowance(addr, pancakeV2test);
+
+      if (amt > approveAmt) {
+        const tx = await token.approve(pancakeV2test,addr,ethers.parseUnits("10000000000",18));
+
+        addResults({
+          title: "info",
+          status: "授权交易发送,等待授权交易成功",
+          txHash: tx.txHash,
+        })
+        await tx.await(1);
+      }
+      const tx = await swap.swapExactTokensForTokensSupportingFeeOnTransferTokens(amt,0, path,addr,169709899400)
+      console.log("tx--swapExactTokensForTokensSupportingFeeOnTransferTokens->",tx.hash)
+
+      addResults({
+        title: "info",
+        status: "交易发送成功",
+        typeTx: buyOrSell === 1 ? "卖出" : "买入",
+        volumeB: "交易量 "+va,
+        txHash: "交易hash "+tx.hash,
+        tokenA: state.timerSwap.tokenA,
+        tokenB: state.timerSwap.tokenB,
+        times: getTimes(),
+      })
+    }catch (e) {
+      addResults({
+        title: "error",
+        err: e.value
+      })
+      index++;
+      if (index >= state.nodes.length) {
+        return
+      }else {
+        await sleep(1000);
+        taskFn(index)
+      }
+    }
+  }
+
+
+  useEffect(() => {
+    if (isStart) {
+      const err = checkArgs()
+      if (err !== null) {
+        addResults({
+          title: "error",
+          err: err.value
+        })
+        return
+      }
+      addResults({
+        title: "success",
+        status: "交易开始",
+      })
+      dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, running: true, results: () => results, task: taskFn}});
+    }else {
+      dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, running: false, task: () => {}}});
     }
 
-    const provider = ethers.getDefaultProvider("https://binance.llamarpc.com")
-    const walletP = new ethers.Wallet(state.timerSwap.privateKeys[0]);
-    const wallet = walletP.connect(provider)
+  },[isStart])
 
-    const token = new ethers.Contract(state.timerSwap.tokenA, tokenAbi, wallet);
-
-    console.log("decimals-->", await token.decimals())
-
-    return
-
-    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, running: true, task: () =>{} }});
+  const startTimer = () => {
+    setStart(true)
   };
 
   const stopTimer = () => {
-    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, running: false, task: ()=>{} }});
+    setStart(false)
   };
 
   const checkArgs = () => {
@@ -143,16 +226,19 @@ const TextFieldLayout = () => {
 
   // @ts-ignore
   const handleStartNumber = (e) => {
-    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, singleAmountStart: e.target.value, running: false, task: ()=>{} }});
+    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, singleAmountStart: e.target.value,}});
+    setStart(false)
   }
   // @ts-ignore
   const handleEndNumber = (e) => {
-    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, singleAmountEnd: e.target.value, running: false, task: ()=>{} }});
+    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, singleAmountEnd: e.target.value}});
+    setStart(false)
   }
 
   // @ts-ignore
   const handleInternal = (e) => {
-    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, internalTimes: e.target.value, running: false, task: ()=>{} }});
+    dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, internalTimes: e.target.value}});
+    setStart(false)
   }
 
   return (
@@ -183,7 +269,9 @@ const TextFieldLayout = () => {
 
         <Box  sx={{ flex: 2, marginLeft: '3rem', marginRight: '1rem'}}>
 
-          <Button variant='contained' fullWidth disabled={state.timerSwap.running} onClick={startTimer}>开始</Button>
+          <Button variant='contained' fullWidth disabled={state.timerSwap.running} onClick={startTimer}>
+            开始
+          </Button>
 
           <Box marginTop='2rem'>
             <Button variant='contained' color='secondary' fullWidth disabled={!state.timerSwap.running} onClick={stopTimer}>
@@ -202,7 +290,7 @@ const TextFieldLayout = () => {
       </Box>
 
       <Box marginTop='3rem' marginRight="1rem" minHeight='15rem' maxHeight="20rem" sx={{border: 1, borderColor: 'primary.main', overflowY: auto}}>
-        {state.timerSwap.results.map((item, index) =>{
+        {results.map((item, index) =>{
           const msg = Object.values(item)
             .filter((value) => value !== "" && value !== undefined)
             .join(" ");

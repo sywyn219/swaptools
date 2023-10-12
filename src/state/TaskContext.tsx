@@ -1,6 +1,7 @@
 
 import {createContext, Dispatch, useReducer, useEffect, ReactNode} from 'react';
 import {Args, defaultState, State} from "../types/types";
+import {sleep} from "../util/arr";
 
 
 type Action =
@@ -9,7 +10,8 @@ type Action =
   | { type: 'SET_BATCH_BUY'; args: Args }
   | { type: 'SET_BATCH_SELL'; args: Args }
   | { type: 'SET_BATCH_INPUT'; args: Args }
-  | { type: 'SET_BATCH_OUTPUT'; args: Args };
+  | { type: 'SET_BATCH_OUTPUT'; args: Args }
+  | { type: 'SET_NODES'; args: [] }
 
 const defaultDispatch: React.Dispatch<Action> = () => {};
 
@@ -34,6 +36,8 @@ const stateReducer = (state: State, action: Action): State => {
       return { ...state, batchInput: action.args };
     case 'SET_BATCH_OUTPUT':
       return { ...state, batchOutPut: action.args };
+    case 'SET_NODES':
+      return { ...state, nodes: action.args}
     default:
       return state;
   }
@@ -45,22 +49,23 @@ type Props = {
 const TaskProvider = ({ children }: Props) => {
   const [state, dispatch] = useReducer(stateReducer, defaultState);
 
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
+  // @ts-ignore
+  useEffect( () => {
+    // @ts-ignore
+    let intervalId = null;
 
     if (state.timerSwap.running) {
       intervalId = setInterval(() => {
-        state.timerSwap.task();
-        dispatch({ type: 'SET_TIMER_SWAP', args: {...state.timerSwap, total: state.timerSwap.total + 1 }});
-      }, 200);
+        state.timerSwap.task(0);
+      }, state.timerSwap.internalTimes * 1000);
     }
 
+    // 返回清理函数
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
+      // @ts-ignore
+      clearInterval(intervalId);
     };
-  }, [state]);
+  }, [state.timerSwap.running]);
 
   return <TaskContext.Provider value={{ state, dispatch }}> {children} </TaskContext.Provider>
 }

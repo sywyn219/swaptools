@@ -43,7 +43,7 @@ const navigation = (): VerticalNavItemsType => {
       path: '/acl',
       action: 'read',
       subject: 'acl-page',
-      title: '地址私钥导入',
+      title: '节点列表',
       icon: 'mdi:shield-outline',
     }
   ]

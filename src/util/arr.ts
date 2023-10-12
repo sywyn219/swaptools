@@ -36,6 +36,7 @@ export function getTimes() {
   return now.format('YYYY-MM-DD HH:mm:ss.SSS');
 }
 
+
 export function isInteger(str: string): boolean {
   return Number.isInteger(Number(str));
 }
@@ -53,4 +54,52 @@ export function compareStrings(str1: string, str2: string): number {
   } else {
     return 0;
   }
+}
+
+export function getRandElement(arr) {
+  const randomIndex = Math.floor(Math.random() * arr.length);
+  return arr[randomIndex];
+}
+
+export function getRandPath(arr)  {
+  const randomIndex = getRandElement(arr)
+
+  const otherIndex = randomIndex === 0 ? 1 : 0;
+
+// 交换元素位置
+  const temp = arr[otherIndex];
+  arr[otherIndex] = arr[randomIndex];
+  arr[randomIndex] = temp;
+
+  return arr
+}
+
+export function getRandBuySell() {
+  // 生成一个随机数
+  const randomNum = Math.random();
+
+// 判断随机数的范围并获取 0 或者 1
+  let result;
+  if (randomNum < 0.5) {
+    return 0;
+  } else {
+    return 1;
+  }
+}
+
+export function getRandomDecimalInRange(minStr, maxStr) {
+  const min = parseFloat(minStr);
+  const max = parseFloat(maxStr);
+
+  // 生成 0 到 1 之间的随机小数
+  const randomDecimal = Math.random();
+
+  // 计算在给定范围内的随机数
+  const result = min + randomDecimal * (max - min);
+
+  return result.toFixed(4);
+}
+
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms * 1000));
 }
